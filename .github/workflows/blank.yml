@@ -1,0 +1,140 @@
+---
+on:
+  push:
+    tags:
+      - "*"
+name: Build
+env:
+  L4T32_BSP: 32.7.4
+  L4T35_BSP: 35.4.1
+jobs:
+  build:
+    strategy:
+      matrix:
+        ubunut_version: ["20.04", "22.04"]
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install just
+        uses: taiki-e/install-action@just
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y podman qemu-user-static lrzip
+          sudo systemctl start systemd-binfmt.service
+
+      - name: Create rootfs
+        run: just build-jetson-rootfs
+
+      - name: Build jetson image for Jetson nano revision 300
+        run: |
+          just build-jetson-image  \
+            -b jetson-nano \
+            -r 300
+          mv jetson.img "jetson-nano-300_${UBUNTU}_${L4T32_BSP}.img"
+          lrzip "jetson-nano-300_${UBUNTU}_${L4T32_BSP}.img"
+          rm -rf "jetson-nano-300_${UBUNTU}_${L4T32_BSP}.img"
+          ls -lht "jetson-nano-300_${UBUNTU}_${L4T32_BSP}.img.lrz"
+
+      - name: Build jetson image for Jetson nano revision 200
+        run: |
+          just build-jetson-image \
+            -b jetson-nano \
+            -r 200
+          mv jetson.img "jetson-nano-200_${UBUNTU}_${L4T32_BSP}.img"
+          lrzip "jetson-nano-200_${UBUNTU}_${L4T32_BSP}.img"
+          rm -rf "jetson-nano-200_${UBUNTU}_${L4T32_BSP}.img"
+          ls -lht "jetson-nano-200_${UBUNTU}_${L4T32_BSP}.img.lrz"
+
+      - name: Build jetson image for Jetson nano revision 100
+        run: |
+          just build-jetson-image \
+            -b jetson-nano \
+            -r 100
+          mv jetson.img "jetson-nano-100_${UBUNTU}_${L4T32_BSP}.img"
+          lrzip "jetson-nano-100_${UBUNTU}_${L4T32_BSP}.img"
+          rm -rf "jetson-nano-100_${UBUNTU}_${L4T32_BSP}.img"
+          ls -lht "jetson-nano-100_${UBUNTU}_${L4T32_BSP}.img.lrz"
+
+      - name: Build jetson image for Jetson nano 2G
+        run: |
+          just build-jetson-image \
+            -b jetson-nano-2gb
+          mv jetson.img "jetson-nano-2gb_${UBUNTU}_${L4T32_BSP}.img"
+          lrzip "jetson-nano-2gb_${UBUNTU}_${L4T32_BSP}.img"
+          rm -rf "jetson-nano-2gb_${UBUNTU}_${L4T32_BSP}.img"
+          ls -lht "jetson-nano-2gb_${UBUNTU}_${L4T32_BSP}.img.lrz"
+
+      - name: Build jetson image for jetson orin nano SD
+        run: |
+          just build-jetson-image \
+            -b jetson-orin-nano \
+            -d SD
+          mv jetson.img "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_SD.img"
+          lrzip "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_SD.img"
+          rm -rf "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_SD.img"
+          ls -lht "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_SD.img.lrz"
+
+      - name: Build jetson image for jetson orin nano USB
+        run: |
+          just build-jetson-image \
+            -b jetson-orin-nano \
+            -d USB
+          mv jetson.img "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_USB.img"
+          lrzip "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_USB.img"
+          rm -rf "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_USB.img"
+          ls -lht "jetson-orin-nano_${UBUNTU}_${L4T35_BSP}_USB.img.lrz"
+
+      - name: Build jetson image for jetson agx xavier SD
+        run: |
+          just build-jetson-image \
+            -b jetson-agx-xavier \
+            -d SD
+          mv jetson.img "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_SD.img"
+          lrzip "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_SD.img"
+          rm -rf "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_SD.img"
+          ls -lht "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_SD.img.lrz"
+
+      - name: Build jetson image for jetson agx xavier USB
+        run: |
+          just build-jetson-image \
+            -b jetson-agx-xavier \
+            -d USB
+          mv jetson.img "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_USB.img"
+          lrzip "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_USB.img"
+          rm -rf "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_USB.img"
+          ls -lht "jetson-agx-xavier_${UBUNTU}_${L4T35_BSP}_USB.img.lrz"
+
+      - name: Build jetson image for jetson xavier nx SD
+        run: |
+          just build-jetson-image \
+          -b jetson-xavier-nx \
+          -d SD
+          mv jetson.img "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_SD.img"
+          lrzip "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_SD.img"
+          rm -rf "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_SD.img"
+          ls -lht "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_SD.img.lrz"
+
+      - name: Build jetson image for jetson xavier nx USB
+        run: |
+          just build-jetson-image \
+          -b jetson-xavier-nx \
+          -d USB
+          mv jetson.img "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_USB.img"
+          lrzip "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_USB.img"
+          rm -rf "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_USB.img"
+          ls -lht "jetson-xavier-nx_${UBUNTU}_${L4T35_BSP}_USB.img.lrz"
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: |
+            [CHANGELOG.md](${{ github.server_url }}/${{ github.repository }}/blob/master/CHANGELOG.md)
+          files: "jetson*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
